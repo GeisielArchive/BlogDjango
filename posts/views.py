@@ -1,11 +1,13 @@
-from django.shortcuts import render, redirect
-from django.views.generic.list import ListView
+from django.contrib import messages
+from django.db.models import Case, Count, Q, When
+from django.shortcuts import redirect, render
 from django.views.generic.edit import UpdateView
-from .models import Post
-from django.db.models import Q, Count, Case, When
+from django.views.generic.list import ListView
+
 from comentarios.forms import FormComentario
 from comentarios.models import Comentario
-from django.contrib import messages
+
+from .models import Post
 
 
 class PostIndex(ListView):
@@ -16,6 +18,7 @@ class PostIndex(ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
+        qs = qs.select_related('categoria_post')
         qs = qs.order_by('-id').filter(publicado_post=True)
         qs = qs.annotate(
             numero_comentarios=Count(
